@@ -2,7 +2,7 @@ import React from "react"
 import Header from "./components/Header"
 import TodoItem from "./components/TodoItem"
 
-function CreateTodo(props) {
+function FormSubmit(props) {
     const style = {
         padding: "10px",
         display: "flex",
@@ -11,7 +11,8 @@ function CreateTodo(props) {
     return (
         <form style={style} className="todo-item" onSubmit={(e) => props.handleFormSubmit(e)}>
             <input placeholder="Create new todo" type="text" name="text" onChange={(e) => props.handleFormChange(e)} value={props.text} />
-            <input type="submit" value="Create" />
+            <button type="submit">Create</button>
+            <button onClick={() => props.handleClearForm()}>Clear</button>
         </form>
     )
 }
@@ -33,6 +34,7 @@ class App extends React.Component {
         this.createTodo = this.createTodo.bind(this)
         this.handleFormChange = this.handleFormChange.bind(this)
         this.handleFormSubmit = this.handleFormSubmit.bind(this)
+        this.handleClearForm = this.handleClearForm.bind(this)
     }
 
     handleFormChange(event){
@@ -48,6 +50,11 @@ class App extends React.Component {
                 text: ""
             }
         })
+    }
+
+    handleClearForm(event) {
+        window.localStorage.clear("todoList")
+        this.loadTodos()
     }
     
     handleChange(id) {
@@ -94,38 +101,8 @@ class App extends React.Component {
     }
 
     loadTodos() {
-        const todos = [
-                {
-                    id: 1,
-                    text: "Take out the trash",
-                    completed: false
-                },
-                {
-                    id: 2,
-                    text: "Grocery shopping",
-                    completed: false
-                },
-                {
-                    id: 3,
-                    text: "Clean gecko tank",
-                    completed: false
-                },
-                {
-                    id: 4,
-                    text: "Mow lawn",
-                    completed: false
-                },
-                {
-                    id: 5,
-                    text: "Catch up on Arrested Development",
-                    completed: false
-                }
-            ]
-        if(window.localStorage.getItem('todoList') === null) {
-            window.localStorage.setItem('todoList', JSON.stringify(todos))
-        }
         this.setState({
-            todos: JSON.parse(window.localStorage.getItem('todoList'))
+            todos: JSON.parse(window.localStorage.getItem('todoList')) || []
         })
     }
 
@@ -143,10 +120,10 @@ class App extends React.Component {
             <div>
                 <Header />
                 <div className="todo-list">
-                    {todoComponents}
+                    {todoComponents.length < 1 ? <h3>Create a todo...</h3> : todoComponents}
                 </div>
                 <div className="todo-list">
-                    <CreateTodo text={this.state.todoForm.text} handleFormSubmit={this.handleFormSubmit} handleFormChange={this.handleFormChange} />
+                    <FormSubmit text={this.state.todoForm.text} handleClearForm={this.handleClearForm} handleFormSubmit={this.handleFormSubmit} handleFormChange={this.handleFormChange} />
                 </div>
             </div> 
         )
